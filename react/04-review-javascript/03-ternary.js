@@ -21,3 +21,15 @@ translation
 /////////////////////////////////////////////////////////
 // Will return second value if book.count was null or undefined
 const count = book.count ?? "no data";
+
+// IF ELSE
+/////////////////////////////////////////////////////////
+//Kada se radi javscript deo JSX ne mogu da se koriste if else jer ne vracaju rezultat. Stoga se ternarni koristi.
+// moze if van JSX koda tipa early return
+```
+// early return
+  if (pizzaObj.soldOut) return null;
+
+  return (
+    <li className={`pizza ${pizzaObj.soldOut ? "sold-out" : ""}`}>
+```
