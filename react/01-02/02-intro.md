@@ -23,6 +23,8 @@ React documentation:
 visual studio code
 plugin: ESLint, Prettier, One Monokai, Material Icon Theme
         - Quokka.js (run js in vsc) - View > Command Panel > Quokka: start in current file
+        - Color Highlight
+        - React Developer Tools for browser plugin
 settings: Save on Focus Change
           default formatter
           format on save
