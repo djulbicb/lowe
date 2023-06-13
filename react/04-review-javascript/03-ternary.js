@@ -9,9 +9,13 @@ console.log(`Book has ${output} pages.`)
 console.log(true && "Print")
 console.log(false && "Dont print")
 
+
 // truthy and falsy
 console.log("bo" && "Lowe")
 console.log(0 && "Falsy")
+
+{length ? `Total items ${length}` : ''} {length && `Total items ${length}`}
+// Preporucuje se ternarni umesto && za ispis. Jer ako je 0 ispisace se nula
 
 const book = {translation:{english:"Eng"}, count:0}
 const translation = book.translation.spanish || "NOT TRANSLATED"
@@ -33,3 +37,4 @@ const count = book.count ?? "no data";
   return (
     <li className={`pizza ${pizzaObj.soldOut ? "sold-out" : ""}`}>
 ```
+
