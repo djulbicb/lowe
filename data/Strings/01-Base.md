@@ -83,6 +83,10 @@ idx = s.index('Bo', 7, 17) # 12
 # Radi sa listama
 [1,2,3,4,5,3,2].index(3,4) # 5 - trazi 3, pocevsi od 4 indexa
 
+# Trick to reverse string or array
+task_text_4 = "reverse every word of this sentence"
+str = task_text_4[::-1]
+
 # Find
 "This is some text".find("not existing")    # -1
 "This is some text".find("some")            # 8
@@ -221,3 +225,12 @@ with open('_data/python_zen.txt', 'r', encoding="utf-8") as f:
 \t - tab
 ```
 
+### String comprehension
+```
+task_text_8 = 'Remove every vowel from this sentence'
+str = [chr for chr in task_text_8 if chr not in ['a','e','i','o','u']]
+
+task_text_7 = 'Remove every word from this sentence having less than five characters'
+str = [word for word in task_text_7.split() if len(word) < 5]
+# ['word', 'from', 'this', 'less', 'than', 'five']
+```
