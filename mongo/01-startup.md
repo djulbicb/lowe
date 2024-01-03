@@ -222,8 +222,179 @@ db.patients.find({history: {$elemMatch: {disease: 'cold'}}})
 db.patients.deleteMany({history: {$elemMatch: {disease: 'cold'}}})
 ```
 
-## Drop database
+## Drop database and collection
 ```
 use flights
 db.dropDatabase()
+
+db.collectionName.drop()
 ```
+## Database stats
+```
+db.stats()
+```
+
+## Simple aggregation
+```
+db.authors.insertOne({name:"Lowe", year:"1990"})
+db.books.insert({title:"Book", writer: new ObjectId("658d9b4ba09da9c5c03dc130")})
+db.books.aggregate([{$lookup: {from: "authors", localField: "writer", foreignField: "_id", as : "agg"}}])
+
+[
+  {
+    _id: ObjectId('658d9b81a09da9c5c03dc131'),
+    title: 'Book',
+    author: ObjectId('658d9b4ba09da9c5c03dc130'),
+    agg: [
+      {
+        _id: ObjectId('658d9b4ba09da9c5c03dc130'),
+        name: 'Lowe',
+        year: '1990'
+      }
+    ]
+  }
+]
+
+Mongo can be schemaless (each object in collection different structure). But a schema is advisable even if its with null
+```
+{
+	name: "Bo",
+	age: 10,
+	job: null
+}
+```
+
+## Data types
+- Text `"Max"`
+- Boolean `true`
+- `Number` (int32), `NumberLong` (int64), `NumberDecimal`
+- ObjectId `ObjectId('asd')`
+- ISODate `ISODate(2018-09-09), new Date()`  and Timestamp `new Timestamp()`
+- embedded document `{"a": {...}}`
+- array `{"b" : [...]}`
+
+By default mongo shell seems all numbers as decimal. So you have to specify them. Because mongo shell is based on javascript and it doesnt tell diff between int and decimal.
+
+```
+db.companies.insertOne({name: "Fresh Apples Inc", isStartup: true, employees: 33, funding: 1234567890123456789, details: {ceo: 'Mark Super', tags: [{title: "super"}, {title: "perfect"}], foundingDate: new Date(), insertedAt: new Timestamp()}})
+
+  {
+    _id: ObjectId('658d7b28a09da9c5c03dc12e'),
+    name: 'Fresh Apples Inc',
+    isStartup: true,
+    employees: 33,
+    funding: 1234567890123456800,
+    details: {
+      ceo: 'Mark Super',
+      tags: [ { title: 'super' }, { title: 'perfect' } ],
+      foundingDate: ISODate('2023-12-28T13:42:00.175Z'),
+      insertedAt: Timestamp({ t: 12345646868, i: 0 })
+    }
+  }
+```
+
+**Notice:**
+- Timestamp({ t: 12345646868, i: 0 }) - saves ordinal too, in case multiple items saved at same time
+- if number is saved `db.num.insertOne({a:1})` it will be saved by default as normal double. Not Integer and not NumberDecimal.
+- funding number is truncted
+- using correct datatype `db.companies.insertOne({a: NumberInt(1)})` lowers data size
+
+```
+## Database Validation
+When creating database
+```
+db.createCollection('posts', {
+  validator: {
+    $jsonSchema: {
+      bsonType: 'object',
+      required: ['title', 'text', 'creator', 'comments'],
+      properties: {
+        title: {
+          bsonType: 'string',
+          description: 'must be a string and is required'
+        },
+        text: {
+          bsonType: 'string',
+          description: 'must be a string and is required'
+        },
+        creator: {
+          bsonType: 'objectId',
+          description: 'must be an objectid and is required'
+        },
+        comments: {
+          bsonType: 'array',
+          description: 'must be an array and is required',
+          items: {
+            bsonType: 'object',
+            required: ['text', 'author'],
+            properties: {
+              text: {
+                bsonType: 'string',
+                description: 'must be a string and is required'
+              },
+              author: {
+                bsonType: 'objectId',
+                description: 'must be an objectid and is required'
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+});
+```
+Updating database with validation
+```
+db.runCommand({
+  collMod: 'posts',
+  validator: {
+    $jsonSchema: {
+      bsonType: 'object',
+      required: ['title', 'text', 'creator', 'comments'],
+      properties: {
+        title: {
+          bsonType: 'string',
+          description: 'must be a string and is required'
+        },
+        text: {
+          bsonType: 'string',
+          description: 'must be a string and is required'
+        },
+        creator: {
+          bsonType: 'objectId',
+          description: 'must be an objectid and is required'
+        },
+        comments: {
+          bsonType: 'array',
+          description: 'must be an array and is required',
+          items: {
+            bsonType: 'object',
+            required: ['text', 'author'],
+            properties: {
+              text: {
+                bsonType: 'string',
+                description: 'must be a string and is required'
+              },
+              author: {
+                bsonType: 'objectId',
+                description: 'must be an objectid and is required'
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  validationAction: 'warn'
+});
+```
+
+## Shell
+Find more info
+```
+mongosh --help
+```
+- `--logpath` - where logs are written to - ie schema validation warnings. Must point to file
+- `--dbpath` - where data gets stored. Must point to folder
+
